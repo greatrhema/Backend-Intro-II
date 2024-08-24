@@ -3,6 +3,9 @@ const express = require("express")
 
 const app = express()
 
+// Middleware
+app.use(express.json())
+
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, ()=>{
@@ -14,42 +17,54 @@ app.listen(PORT, ()=>{
 // CRUD Authentication
 
 app.get("/", (request, response)=>{
-    response.json("Welcome to Acces bank Server")
+    response.json("Welcome to Access bank Server")
+})
+
+app.post('/chibuzor', (request, response)=>{
+    const { email, password } = request.body
+
+
+    response.json(email)
 })
 
 
-const users = [
-    {
-        firstName: "David",
-        lastName: "Samp[sopn"
-    },
-    {
-        firstName: "David",
-        lastName: "Samp[sopn"
-    },
-    {
-        firstName: "David",
-        lastName: "Samp[sopn"
-    },
-]
+app.put("/eze", (req, res)=>{
 
-app.get("/users", (request, response)=>{
+    const { name, state, age } = req.body
 
-    response.json(users)
-})
+    if(!name){
+        return res.json({message: "Please add your a name"})
+    }
 
-app.post("/login", (request, response)=>{
-
-    const { email, password } = request.body 
+    return res.json({message: "Successful", name})
 
 })
-app.post("/login", (request, response)=>{
 
-    const { email, password } = request.body 
 
+app.post("/register", (req, res)=>{
+    const { email, name, state, age, phoneNumber } = req.body
+
+    if(!email){
+        return res.json({message: "Please add your email"})
+    }
+
+    if( age < 18){
+        return res.json({message: "Please you're underage"})
+    }
+
+    if(!name){
+        return res.json({message: "Please add your name"})
+    }
+
+    const newUser = { email, name, state, age, phoneNumber}
+
+    // Save to DATABASE
+
+    return res.json({message: "Registration Successful", newUser})
 })
-app.post("/login", (request, response)=>{
 
-    const { email, password } = request.body 
 
-})
+
+
+
+ 
