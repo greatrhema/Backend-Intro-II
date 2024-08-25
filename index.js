@@ -1,6 +1,10 @@
 
 const express = require("express")
 const dotenv = require("dotenv")
+const mongoose = require("mongoose")
+
+const connectDB = require("./db")
+const Students = require("./studentModel")
 
 dotenv.config()
 
@@ -12,6 +16,15 @@ app.use(express.json())
 
 const PORT = process.env.PORT || 5000
 
+
+// Connect MongoDB
+// mongoose.connect(`${process.env.MONGODB_URL}`)
+
+// .then(()=> console.log("MongoDB Connected..!"))
+connectDB() 
+
+
+// Listen
 app.listen(PORT, ()=>{
     console.log(`Server started running on ${PORT}`)
 })
@@ -44,9 +57,14 @@ app.put("/eze", (req, res)=>{
 
 })
 
+// Register API
+app.post("/rrrrr", (req, res)=>{
+    const { email, name, state, age, phoneNumber, cf_password, password } = req.body
 
-app.post("/register", (req, res)=>{
-    const { email, name, state, age, phoneNumber } = req.body
+    if(password !== cf_password){
+        return res.status(400).json({message: "Passwords do not match"})
+
+    }
 
     if(!email){
         return res.status(400).json({message: "Please add your email"})
@@ -67,7 +85,7 @@ app.post("/register", (req, res)=>{
     return res.status(200).json({message: "Registration Successful", newUser})
 })
 
-
+// Edit User API
 app.put("/edit_user", (req, res)=>{
 
     const { name, email, phoneNumber } = req.body 
@@ -97,6 +115,44 @@ app.put("/edit_user", (req, res)=>{
         user: newUser
     })
 
+})
+
+
+
+// Real C R U D
+
+app.post("/register", async (req, res)=>{
+    const {firstName, lastName, age, email, password } = req.body
+
+    if(!email){
+        return res.status(400).json({message: "Please add your email"})
+    }
+
+    const alreadyExisting = await Students.findOne({email})
+
+    if(alreadyExisting){
+        return res.status(400).json({message: "This user already exist!"})
+    }
+
+    const newUser = new Students({firstName, lastName, age, email, password })
+
+    await newUser.save()
+
+    return res.status(200).json({
+        message: "User Registration Successful",
+        user: newUser
+    })
+})
+
+app.get("/students", async (req, res)=>{
+
+    const allStudents = await Students.find()
+
+    return res.status(200).json({
+        message: "Successful",
+        count: allStudents.length,
+        allStudents
+    })
 })
 
 
