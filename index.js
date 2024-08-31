@@ -121,6 +121,7 @@ app.put("/edit_user", (req, res)=>{
 
 // Real C R U D
 
+// Create
 app.post("/register", async (req, res)=>{
     const {firstName, lastName, age, email, password } = req.body
 
@@ -144,6 +145,7 @@ app.post("/register", async (req, res)=>{
     })
 })
 
+// Get All
 app.get("/students", async (req, res)=>{
 
     const allStudents = await Students.find()
@@ -155,9 +157,81 @@ app.get("/students", async (req, res)=>{
     })
 })
 
+// Get One
+app.get("/one-student/:id", async (req, res)=>{
+
+    const { id } = req.params
+
+    const student = await Students.findById(id)
+
+    if(!student){
+        return res.status(404).json({message: "Student account not found!"})
+    }
+
+    return res.status(200).json({message: "Successful", student})
+
+})
+
+
+// Update One
+
+app.put("/edit-student/:id", async (req, res)=>{
+
+    const { id } = req.params
+
+    const { firstName, lastName } = req.body
+
+    const updatedUser = await Students.findByIdAndUpdate(
+        id,
+        { firstName, lastName },
+        {new: true}
+    )
+
+    return res.status(200).json({
+        message: "Successful",
+        user: updatedUser
+    })
+
+})
+
+
+// Delete One
+
+app.delete("/delete-student/:id", async (req, res)=>{
+
+    const { id } = req.params
+
+    const deletedStudent = await Students.findByIdAndDelete(id)
+
+    return res.status(200).json({message: "Successful"})
+
+
+})
 
 
 
+// Fund wallet
+
+app.post("/fund-wallet", async (req, res)=>{
+
+    const { email, amount } = req.body
+
+    const user = await Students.findOne({ email })
+
+    if(!user){
+        return res.statusCode(404).json({message: "User Account not found!"})
+    }
+
+    user.walletBalance += Number(amount)
+
+    await user.save()
+
+    return res.status(200).json({
+        message: "Successful",
+        user
+    })
+
+})
 
 
 

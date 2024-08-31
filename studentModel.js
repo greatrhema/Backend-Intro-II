@@ -8,6 +8,8 @@ const studentSchema = new mongoose.Schema({
     email: {type: String, require: true},
     password: {type: String, require: true},
 
+    walletBalance: {type: Number, default: 0}
+
 })
 
 
